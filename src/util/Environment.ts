@@ -7,6 +7,7 @@ export default {
 
     EASY_STARTUP: tryParseBoolean(process.env.EASY_STARTUP, false),
     SKIP_TUTORIAL: tryParseBoolean(process.env.SKIP_TUTORIAL, false),
+    SYNC_TICKS: tryParseBoolean(process.env.SYNC_TICKS, false),
     WEBSITE_REGISTRATION: tryParseBoolean(process.env.WEBSITE_REGISTRATION, true),
 
     /// web server

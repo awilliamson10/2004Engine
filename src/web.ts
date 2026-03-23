@@ -175,7 +175,19 @@ export async function startManagementWeb() {
                 }
             })
         },
-        fetch() {
+        fetch(req) {
+            // Sync tick endpoint: POST /tick advances the engine by one tick
+            // Only available when SYNC_TICKS=true
+            if (Environment.SYNC_TICKS && req.method === 'POST' && new URL(req.url).pathname === '/tick') {
+                // First call activates sync mode — engine stops auto-ticking
+                if (!World.syncTickActive) {
+                    World.syncTickActive = true;
+                }
+                World.cycle();
+                return new Response(JSON.stringify({ tick: World.currentTick }), {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            }
             return new Response(null, { status: 404 });
         },
     });

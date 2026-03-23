@@ -162,6 +162,7 @@ class World {
     readonly cycleStats: Uint16Array = new Uint16Array(12);
 
     tickRate: number = World.TICKRATE; // speeds up when we're processing server shutdown
+    syncTickActive: boolean = false; // when true, engine only ticks via POST /tick
     currentTick: number = 0; // the current tick of the game world.
     nextTick: number = 0; // the next time the game world should tick.
     shutdownTick: number = -1;
@@ -503,7 +504,11 @@ class World {
 
             // ----
 
-            setTimeout(this.cycle.bind(this), Math.max(0, this.tickRate - (Date.now() - start) - drift));
+            if (this.syncTickActive) {
+                // Sync mode activated — don't auto-schedule, wait for POST /tick
+            } else {
+                setTimeout(this.cycle.bind(this), Math.max(0, this.tickRate - (Date.now() - start) - drift));
+            }
         } catch (err) {
             if (err instanceof Error) {
                 printError('eep eep cabbage! An unhandled error occurred during the cycle: ' + err.message);
