@@ -176,17 +176,31 @@ export async function startManagementWeb() {
             })
         },
         fetch(req) {
-            // Sync tick endpoint: POST /tick advances the engine by one tick
-            // Only available when SYNC_TICKS=true
-            if (Environment.SYNC_TICKS && req.method === 'POST' && new URL(req.url).pathname === '/tick') {
-                // First call activates sync mode — engine stops auto-ticking
-                if (!World.syncTickActive) {
-                    World.syncTickActive = true;
+            if (Environment.SYNC_TICKS) {
+                const pathname = new URL(req.url).pathname;
+
+                // POST /tick — advance engine by one tick (activates sync mode)
+                if (req.method === 'POST' && pathname === '/tick') {
+                    if (!World.syncTickActive) {
+                        World.syncTickActive = true;
+                    }
+                    World.cycle();
+                    return new Response(JSON.stringify({ tick: World.currentTick }), {
+                        headers: { 'Content-Type': 'application/json' }
+                    });
                 }
-                World.cycle();
-                return new Response(JSON.stringify({ tick: World.currentTick }), {
-                    headers: { 'Content-Type': 'application/json' }
-                });
+
+                // POST /sync-off — deactivate sync mode, resume auto-ticking
+                // Call this before disconnecting so the next client can login
+                if (req.method === 'POST' && pathname === '/sync-off') {
+                    if (World.syncTickActive) {
+                        World.syncTickActive = false;
+                        World.cycle(); // restart the auto-tick chain
+                    }
+                    return new Response(JSON.stringify({ sync: false, tick: World.currentTick }), {
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                }
             }
             return new Response(null, { status: 404 });
         },
