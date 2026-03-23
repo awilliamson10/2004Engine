@@ -8,6 +8,7 @@ import World from '#/engine/World.js';
 import Packet from '#/io/Packet.js';
 import ClientSocket from '#/server/ClientSocket.js';
 import { fromBase37, toBase37 } from '#/util/JString.js';
+import Environment from '#/util/Environment.js';
 
 export class PlayerLoading {
     public static readonly SAV_MAGIC: number = 0x2004;
@@ -49,6 +50,16 @@ export class PlayerLoading {
             player.stats[PlayerStat.HITPOINTS] = getExpByLevel(10);
             player.baseLevels[PlayerStat.HITPOINTS] = 10;
             player.levels[PlayerStat.HITPOINTS] = 10;
+
+            if (Environment.SKIP_TUTORIAL) {
+                // Spawn in Lumbridge instead of Tutorial Island
+                // Coords from tutorial.rs2: p_telejump(0_50_50_22_22) = (50*64+22, 50*64+22)
+                player.x = 3222;
+                player.z = 3222;
+                // Mark tutorial complete (varp 281 = 1000)
+                player.vars[281] = 1000;
+            }
+
             return player;
         }
 

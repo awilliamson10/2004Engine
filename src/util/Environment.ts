@@ -6,6 +6,7 @@ export default {
     IS_BUN: typeof process.versions.bun !== 'undefined', // not user-configurable
 
     EASY_STARTUP: tryParseBoolean(process.env.EASY_STARTUP, false),
+    SKIP_TUTORIAL: tryParseBoolean(process.env.SKIP_TUTORIAL, false),
     WEBSITE_REGISTRATION: tryParseBoolean(process.env.WEBSITE_REGISTRATION, true),
 
     /// web server
