@@ -403,6 +403,30 @@ export default class ClientCheatHandler extends ClientGameMessageHandler<ClientC
                 }
 
                 player.invAdd(InvType.INV, obj, 1000, false);
+            } else if (cmd === 'clearinv') {
+                // custom
+                player.invClear(InvType.INV);
+            } else if (cmd === 'clearequip') {
+                // custom
+                player.invClear(InvType.WORN);
+            } else if (cmd === 'equip') {
+                // custom
+                if (args.length < 1) {
+                    return false;
+                }
+
+                const equipObj = ObjType.getId(args[0]);
+                if (equipObj === -1) {
+                    return false;
+                }
+
+                player.invDel(InvType.INV, equipObj, 1);
+                player.invAdd(InvType.WORN, equipObj, 1, false);
+            } else if (cmd === 'fullheal') {
+                // custom
+                for (let i = 0; i < player.levels.length; i++) {
+                    player.levels[i] = player.baseLevels[i];
+                }
             } else if (cmd === 'broadcast' && Environment.NODE_PRODUCTION) {
                 // custom
                 if (args.length < 0) {
